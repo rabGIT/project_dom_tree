@@ -34,6 +34,8 @@ class Parser
       if e.match(/^<[\/].+>/)
         node = node.parent
         node.children << TagNode.new(e, Tag.new((e.match(/<(.+?)>/).captures[0]), nil, nil, nil, nil, nil), node, [])
+      elsif e.match(/^<img.+?>|^<hr.+?>/)
+        node.children << TagNode.new(e, Tag.new((e.match(/<(.+?)>/).captures[0]), nil, nil, nil, nil, nil), node, [])
       elsif e.match(/<.+>/)
         node.children << TagNode.new(e, parse_tag(e), node, [])
         node = node.children[-1]
@@ -62,6 +64,6 @@ end
 if __FILE__ == $PROGRAM_NAME
   p = Parser.new("< !doctype html><div>  div text before  <p>    p text  </p>  <div>    more div text  </div>  div text after</div>")
   p.parse
-  p1 = Parser.new("<p>Before text <span>mid text (not included in text attribute of the paragraph tag)</span> after text</p>")
+  p1 = Parser.new("<html><p>Before text <img src='bla'><span>mid text (not included in text attribute of the paragraph tag)</span> after text</p>")
   p1.parse
 end
