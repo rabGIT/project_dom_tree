@@ -15,7 +15,11 @@ class Searcher
 
   def search_descendants(node, type, value)
     @search_results = []
-    search_proc = proc { |n| @search_results << n if n.attributes[type] && n.attributes[type].to_s.match(value + '\b')}
+    if value.is_a?(Regexp)
+      search_proc = proc { |n| @search_results << n if n.attributes[type] && n.attributes[type].to_s.match(value)}
+    else
+      search_proc = proc { |n| @search_results << n if n.attributes[type] && n.attributes[type].to_s.match(value + '\b')}
+    end
     traverse(node, search_proc)
     @search_results
   end
@@ -23,7 +27,11 @@ class Searcher
   def search_ancestors(node, type, value)
     @search_results = []
     while node
-      @search_results << node if (node.attributes[type] && node.attributes[type].to_s.match(value + '\b'))
+      if value.is_a?(Regexp)
+        @search_results << node if (node.attributes[type] && node.attributes[type].to_s.match(value))
+      else
+        @search_results << node if (node.attributes[type] && node.attributes[type].to_s.match(value + '\b'))
+      end
       node = node.parent
     end
     @search_results
@@ -48,7 +56,7 @@ if __FILE__ == $PROGRAM_NAME
 #  r1.print_html
   s1 = Searcher.new(p1.tree)
   class_em = s1.search_by(:classes, 'emphasized')
-  type_head = s1.search_by(:type, 'head')
+  type_head = s1.search_by(:type, /^head$/)
   type_head.each do |result|
     r1.print_stats(result)
   end
