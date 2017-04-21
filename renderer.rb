@@ -24,10 +24,10 @@ class Renderer
   def print_stats(node = @root)
     puts "Node: #{node.type.ljust(40)}"
     puts "Attributes: #{node.attributes}"
-    @count = {} #clear out from any previous run
-    counter = Proc.new { |n| @count[n.attributes.type] = (@count[n.attributes.type] ? @count[n.attributes.type] += 1 : 1 )}
+    @count = {}
+    counter = proc { |n| @count[n.attributes.type] = (@count[n.attributes.type] ? @count[n.attributes.type] += 1 : 1 )}
     traverse(node, counter)
-    puts "Count of descendant node types: "
+    puts 'Count of descendant node types: '
     @count.each do |type|
       puts "   #{type[0]}: #{type[1]}"
     end
