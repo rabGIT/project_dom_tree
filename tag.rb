@@ -1,4 +1,4 @@
-Tag = Struct.new(:type, :classes, :id, :name, :title, :src)
+require_relative 'structs'
 
 def parse_tag(ttp)
   reg_ex = []

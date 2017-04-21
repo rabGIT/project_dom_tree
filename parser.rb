@@ -1,34 +1,22 @@
 require_relative 'tag'
-
-TagNode = Struct.new(:type, :attributes, :parent, :children)
+require_relative 'structs'
 
 # DOM parser --> HTML in, produces tree with clean print
+# initialize with HTML string or filename with HTML
 class Parser
   def initialize(filename)
     @buffer = load_file(filename)
     @tokenized = []
-    @root = TagNode.new('document', nil, nil, [])
+    @root = TagNode.new('document', Tag.new('root', nil, nil, nil, nil, nil), nil, [])
   end
 
   def parse
     tokenize
     parse_to_tree
-    print_tree(@root)
-    print_html(@root)
   end
 
-  def print_tree(node, indent = 0, html_only = false)
-    indent += 3
-    print '   '.rjust(indent)
-    puts "#{node.type.ljust(40 - indent)}#{node.attributes unless html_only}"
-    return if node.children.nil?
-    node.children.each do |n|
-      print_tree(n, indent, html_only)
-    end
-  end
-
-  def print_html(node)
-    print_tree(node, 0, true)
+  def tree
+    @root
   end
 
   private
@@ -66,7 +54,7 @@ class Parser
       if e.match(/^<[\/].+>/)
         node = node.parent
         node.children << TagNode.new(e, Tag.new((e.match(/<(.+?)>/).captures[0]), nil, nil, nil, nil, nil), node, [])
-      elsif e.match(/^<img.+?>|^<hr.+?>/)
+      elsif e.match(/^<img.+?>|^<hr.+?>|^<!doctype.+?>/)
         node.children << TagNode.new(e, Tag.new((e.match(/<(.+?)>/).captures[0]), nil, nil, nil, nil, nil), node, [])
       elsif e.match(/<.+>/)
         node.children << TagNode.new(e, parse_tag(e), node, [])
